@@ -57,4 +57,16 @@ pipeline {
             }
         }
     }
+    post {
+        success {
+            mail to: 's_wolff22@stud.hwr-berlin.de',
+                 subject: "Jenkins Build Success: ${env.JOB_NAME}",
+                 body: "The build was successful!"
+        }
+        failure {
+            mail to: 's_wolff22@stud.hwr-berlin.de',
+                 subject: "Jenkins Build Failed: ${env.JOB_NAME}",
+                 body: "The build failed. Please check the logs."
+        }
+    }
 }
