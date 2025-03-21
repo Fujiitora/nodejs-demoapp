@@ -64,21 +64,31 @@ pipeline {
                     else
                         git clone https://github.com/${env.GITHUB_USER}/nodejs-demoapp.git .
                     fi
-                
-                    cd src
-                    # Start app in background
-
-                    # Kill any process using port 3000
-                    PID=\$(lsof -t -i:3000)
-                    if [ -n "\$PID" ]; then
-                      echo "Killing process on port 3000 (PID: \$PID)"
-                      kill -9 \$PID
-                    fi
-
-                    echo "🚀 Starting app in background..."
-                    nohup npm start > /var/www/app/app.log 2>&1 &
+                           
+                    # --- create systemd service ---
+                    cat << 'SERVICE' > /etc/systemd/system/nodejs-demoapp.service
+                    [Unit]
+                    Description=Node.js Demo App
+                    After=network.target
                     
-                    echo "✅ App is running. Logs: /var/www/app/app.log"               
+                    [Service]
+                    WorkingDirectory=/var/www/app/src
+                    ExecStart=/usr/bin/node --expose_gc server.mjs
+                    Restart=always
+                    User=root
+                    Environment=NODE_ENV=production
+                    StandardOutput=append:/var/www/app/app.log
+                    StandardError=append:/var/www/app/app-error.log
+                    
+                    [Install]
+                    WantedBy=multi-user.target
+                    SERVICE
+                    
+                    systemctl daemon-reload
+                    systemctl enable nodejs-demoapp
+                    systemctl restart nodejs-demoapp
+                    
+                    echo "✅ App deployed and running as a systemd service"
                     """
                 }
             }
