@@ -8,6 +8,23 @@ pipeline {
         SSH_HOST = "10.30.30.17"
         SSH_CREDENTIALS = "4c3bc3ca-9a02-4ac1-8058-325dd39e8b4b"
         JOB_NAME = "demo-app_cicd"
+        LINUX_SERVICE = """
+            [Unit]
+            Description=Node.js Demo App
+            After=network.target
+            
+            [Service]
+            WorkingDirectory=/var/www/app/src
+            ExecStart=/usr/bin/node --expose_gc server.mjs
+            Restart=always
+            User=root
+            Environment=NODE_ENV=production
+            StandardOutput=append:/var/www/app/app.log
+            StandardError=append:/var/www/app/app-error.log
+            
+            [Install]
+            WantedBy=multi-user.target
+            SERVICE"""
     }
 
     stages {
@@ -66,27 +83,13 @@ pipeline {
                     fi
                            
                     # --- create systemd service ---
-                    cat << 'SERVICE' > /etc/systemd/system/nodejs-demoapp.service
-                    [Unit]
-                    Description=Node.js Demo App
-                    After=network.target
-                    
-                    [Service]
-                    WorkingDirectory=/var/www/app/src
-                    ExecStart=/usr/bin/node --expose_gc server.mjs
-                    Restart=always
-                    User=root
-                    Environment=NODE_ENV=production
-                    StandardOutput=append:/var/www/app/app.log
-                    StandardError=append:/var/www/app/app-error.log
-                    
-                    [Install]
-                    WantedBy=multi-user.target
-                    SERVICE
+                    cat << '${env.LINUX_SERVICE}' > /etc/systemd/system/nodejs-demoapp.service
                     
                     systemctl daemon-reload
                     systemctl enable nodejs-demoapp
                     systemctl restart nodejs-demoapp
+
+                    echo "✅ App deployed and running as a systemd service"
                     """
                 }
             }
