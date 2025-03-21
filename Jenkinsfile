@@ -83,13 +83,30 @@ pipeline {
                     fi
                            
                     # --- create systemd service ---
-                    cat << '${env.LINUX_SERVICE}' > /etc/systemd/system/nodejs-demoapp.service
+                    cat <<'SERVICE_EOF' | sudo tee /etc/systemd/system/nodejs-demoapp.service > /dev/null
+[Unit]
+Description=Node.js Demo App
+After=network.target
+
+[Service]
+WorkingDirectory=/var/www/app/src
+ExecStart=/usr/bin/node --expose_gc server.mjs
+Restart=always
+User=root
+Environment=NODE_ENV=production
+StandardOutput=append:/var/www/app/app.log
+StandardError=append:/var/www/app/app-error.log
+
+[Install]
+WantedBy=multi-user.target
+SERVICE_EOF
                     
                     systemctl daemon-reload
                     systemctl enable nodejs-demoapp
                     systemctl restart nodejs-demoapp
 
                     echo "✅ App deployed and running as a systemd service"
+                    EOF
                     """
                 }
             }
