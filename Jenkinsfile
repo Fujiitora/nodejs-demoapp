@@ -67,8 +67,8 @@ pipeline {
                     fi
                     cd src
                     npm install
-                    pm2 describe app > /dev/null || pm2 start index.js --name app
-                    pm2 restart app
+                    pm2 describe app > /dev/null || pm2 start npm --name app -- start
+                    pm2 restart app --update-env
                     EOF
                     """
                 }
