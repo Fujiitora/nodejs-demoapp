@@ -34,9 +34,6 @@ pipeline {
             }
         }
         stage('Deploy to Server') {
-            when {
-                branch 'main'
-            }
             steps {
                 sshagent([env.SSH_CREDENTIALS]) {
                     sh """
