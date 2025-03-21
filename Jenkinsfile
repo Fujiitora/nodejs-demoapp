@@ -68,10 +68,11 @@ pipeline {
                     cd src
                     # Start app in background
 
-                    PID=$(lsof -t -i:3000)
-                    if [ -n "$PID" ]; then
-                      echo "Killing process on port 3000 (PID: $PID)"
-                      kill -9 $PID
+                    # Kill any process using port 3000
+                    PID=\$(lsof -t -i:3000)
+                    if [ -n "\$PID" ]; then
+                      echo "Killing process on port 3000 (PID: \$PID)"
+                      kill -9 \$PID
                     fi
 
                     echo "🚀 Starting app in background..."
