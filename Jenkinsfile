@@ -66,11 +66,7 @@ pipeline {
                     fi
                 
                     cd src
-                    npm install
-                
-                    # Start the app directly (in background so it doesn't block SSH session)
-                    nohup npm start > /var/www/app/app.log 2>&1 &
-                    'EOF'
+                    make run                    
                     """
                 }
             }
