@@ -52,6 +52,11 @@ pipeline {
                     else
                         echo "npm already installed."
                     fi
+
+                    if ! command -v pm2 &> /dev/null; then
+                        echo "Installing PM2..."
+                        npm install -g pm2
+                    fi
                 
                     mkdir -p /var/www/app
                     cd /var/www/app
