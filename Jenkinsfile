@@ -78,8 +78,7 @@ pipeline {
                     echo "🚀 Starting app in background..."
                     nohup npm start > /var/www/app/app.log 2>&1 &
                     
-                    echo "✅ App is running. Logs: /var/www/app/app.log"
-                    EOF               
+                    echo "✅ App is running. Logs: /var/www/app/app.log"               
                     """
                 }
             }
