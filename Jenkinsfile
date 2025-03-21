@@ -37,7 +37,22 @@ pipeline {
             steps {
                 sshagent([env.SSH_CREDENTIALS]) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST <<EOF
+                    ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST <<'EOF'
+                    if ! command -v git &> /dev/null; then
+                        echo "Git not found. Installing..."
+                        apt update && apt install -y git
+                    else
+                        echo "Git already installed."
+                    fi
+                
+                    if ! command -v npm &> /dev/null; then
+                        echo "npm not found. Installing Node.js + npm..."
+                        curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+                        apt install -y nodejs
+                    else
+                        echo "npm already installed."
+                    fi
+                
                     mkdir -p /var/www/app
                     cd /var/www/app
                     if [ -d .git ]; then
@@ -47,6 +62,7 @@ pipeline {
                     fi
                     cd src
                     npm install
+                    pm2 describe app > /dev/null || pm2 start index.js --name app
                     pm2 restart app
                     EOF
                     """
