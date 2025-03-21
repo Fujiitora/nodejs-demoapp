@@ -87,8 +87,6 @@ pipeline {
                     systemctl daemon-reload
                     systemctl enable nodejs-demoapp
                     systemctl restart nodejs-demoapp
-                    EOF
-                    echo "✅ App deployed and running as a systemd service"
                     """
                 }
             }
