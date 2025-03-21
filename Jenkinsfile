@@ -7,7 +7,7 @@ pipeline {
         SSH_USER = "root"
         SSH_HOST = "10.30.30.17"
         SSH_CREDENTIALS = "4c3bc3ca-9a02-4ac1-8058-325dd39e8b4b"
-        JOB_NAME = demo-app_cicd
+        JOB_NAME = "demo-app_cicd"
     }
 
     stages {
