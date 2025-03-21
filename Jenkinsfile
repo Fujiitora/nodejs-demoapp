@@ -106,7 +106,6 @@ SERVICE_EOF
                     systemctl restart nodejs-demoapp
 
                     echo "✅ App deployed and running as a systemd service"
-                    EOF
                     """
                 }
             }
