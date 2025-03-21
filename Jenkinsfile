@@ -38,37 +38,39 @@ pipeline {
                 sshagent([env.SSH_CREDENTIALS]) {
                     sh """
                     ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST <<'EOF'
+                    set -e
+                
+                    # Install Git if needed
                     if ! command -v git &> /dev/null; then
-                        echo "Git not found. Installing..."
                         apt update && apt install -y git
-                    else
-                        echo "Git already installed."
                     fi
                 
+                    # Install Node.js if needed
                     if ! command -v npm &> /dev/null; then
-                        echo "npm not found. Installing Node.js + npm..."
                         curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
                         apt install -y nodejs
-                    else
-                        echo "npm already installed."
                     fi
-
+                
+                    # Install PM2 if needed
                     if ! command -v pm2 &> /dev/null; then
-                        echo "Installing PM2..."
                         npm install -g pm2
                     fi
                 
                     mkdir -p /var/www/app
                     cd /var/www/app
+                
                     if [ -d .git ]; then
                         git pull origin main
                     else
                         git clone https://github.com/${env.GITHUB_USER}/nodejs-demoapp.git .
                     fi
+                
                     cd src
                     npm install
+                
                     pm2 describe app > /dev/null || pm2 start npm --name app -- start
                     pm2 restart app --update-env
+                    pm2 save
                     EOF
                     """
                 }
