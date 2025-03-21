@@ -66,7 +66,7 @@ pipeline {
                     fi
                 
                     cd src
-                    make run                    
+                    nohup npm run watch                 
                     """
                 }
             }
