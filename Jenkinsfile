@@ -66,7 +66,19 @@ pipeline {
                     fi
                 
                     cd src
-                    nohup npm run watch                 
+                    # Start app in background
+
+                    PID=$(lsof -t -i:3000)
+                    if [ -n "$PID" ]; then
+                      echo "Killing process on port 3000 (PID: $PID)"
+                      kill -9 $PID
+                    fi
+
+                    echo "🚀 Starting app in background..."
+                    nohup npm start > /var/www/app/app.log 2>&1 &
+                    
+                    echo "✅ App is running. Logs: /var/www/app/app.log"
+                    EOF               
                     """
                 }
             }
