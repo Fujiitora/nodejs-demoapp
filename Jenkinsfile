@@ -8,24 +8,6 @@ pipeline {
         SSH_HOST = "10.30.30.17"
         SSH_CREDENTIALS = "4c3bc3ca-9a02-4ac1-8058-325dd39e8b4b"
         JOB_NAME = "demo-app_cicd"
-        LINUX_SERVICE = """
-            [Unit]
-            Description=Node.js Demo App
-            After=network.target
-            
-            [Service]
-            WorkingDirectory=/var/www/app/src
-            ExecStart=/usr/bin/node --expose_gc server.mjs
-            Restart=always
-            User=root
-            Environment=NODE_ENV=production
-            StandardOutput=append:/var/www/app/app.log
-            StandardError=append:/var/www/app/app-error.log
-            
-            [Install]
-            WantedBy=multi-user.target
-            SERVICE"""
-    }
 
     stages {
         stage('Clone Repository') {
@@ -50,6 +32,23 @@ pipeline {
                 }
             }
         }
+
+        stage('Lint') {
+            steps {
+                dir('src') {
+                    sh 'npm run lint || true' // Let it pass even if there are warnings, or remove `|| true` to fail on lint issues
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                dir('src') {
+                    sh 'npm test'
+                }
+            }
+        }
+        
         stage('Deploy to Server') {
             steps {
                 sshagent([env.SSH_CREDENTIALS]) {
