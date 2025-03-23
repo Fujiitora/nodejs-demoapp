@@ -45,7 +45,13 @@ pipeline {
         stage('Run Tests') {
             steps {
                 dir('src') {
-                    sh 'npm test'
+                    sh '''
+                    node server.mjs &
+                    SERVER_PID=$!
+                    sleep 5
+                    npm test
+                    kill $SERVER_PID
+                    '''
                 }
             }
         }
