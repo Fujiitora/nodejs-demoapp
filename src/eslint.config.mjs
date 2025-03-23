@@ -1,17 +1,20 @@
 import globals from 'globals'
 import js from '@eslint/js'
-import eslintConfigPrettier from 'eslint-config-prettier'
+import eslintPluginPrettier from 'eslint-plugin-prettier'
 
 export default [
   js.configs.recommended,
   eslintConfigPrettier,
   {
+    plugins: {
+      prettier: eslintPluginPrettier,
+    },
+
     languageOptions: {
       globals: {
         ...globals.node,
         ...globals.browser,
       },
-
       ecmaVersion: 'latest',
       sourceType: 'module',
     },
@@ -20,7 +23,7 @@ export default [
       'no-var': 'error',
       'no-console': 'off',
       'no-debugger': 'off',
-
+      'prefer-const': 'error',
       'no-unused-vars': [
         'error',
         {
@@ -28,7 +31,8 @@ export default [
         },
       ],
 
-      'prefer-const': 'error',
+      // 💡 Enforce Prettier formatting as part of linting
+      'prettier/prettier': 'error',
     },
   },
 ]
